@@ -9,6 +9,7 @@ import torch.utils.data as data
 import torchvision
 import time
 
+
 """
     CalculateLandmark2D:
         'euler_angle' is a euler_angle tensor with size (batch_size, 3),
@@ -79,7 +80,7 @@ class CariFace():
     def init_numbers(self, landmark_num=68, vertex_num=6144, device_num=0):
         self.landmark_num = landmark_num
         self.vertex_num = vertex_num
-        self.device_num = device_num
+        #'cpu' = device_num
 
     def init_data(self, data_path="data/"):
         """
@@ -95,15 +96,15 @@ class CariFace():
         one_ring_lbweights_path = data_path + "one_ring_lbweights.npy" # the Laplacian weights of each connection
         landmark_index_path = data_path + "best_68.txt" # the ids of 68 3D landmarks
         # load pca_pri and logR_S_mean
-        self.pca_pri = torch.from_numpy(np.load(pca_pri_path)).float().to(self.device_num)
-        self.logR_S_mean = torch.from_numpy(np.load(logR_S_mean_path)).float().to(self.device_num)
+        self.pca_pri = torch.from_numpy(np.load(pca_pri_path)).float().to('cpu')
+        self.logR_S_mean = torch.from_numpy(np.load(logR_S_mean_path)).float().to('cpu')
         # A_pinv and warehouse_0's vertices
-        self.A_pinv = torch.from_numpy(np.load(A_pinv_path)).to(self.device_num).float()
-        self.P_ = torch.from_numpy(np.load(warehouse_vertex_path)).to(self.device_num).float()
+        self.A_pinv = torch.from_numpy(np.load(A_pinv_path)).to('cpu').float()
+        self.P_ = torch.from_numpy(np.load(warehouse_vertex_path)).to('cpu').float()
         # connects and landmarks' indices
-        self.one_ring_center_ids = torch.from_numpy(np.loadtxt(one_ring_center_ids_path)).to(self.device_num).long()
-        self.one_ring_ids = torch.from_numpy(np.loadtxt(one_ring_ids_path)).to(self.device_num).long()
-        self.one_ring_lbweights = torch.from_numpy(np.load(one_ring_lbweights_path)).to(self.device_num).float()
+        self.one_ring_center_ids = torch.from_numpy(np.loadtxt(one_ring_center_ids_path)).to('cpu').long()
+        self.one_ring_ids = torch.from_numpy(np.loadtxt(one_ring_ids_path)).to('cpu').long()
+        self.one_ring_lbweights = torch.from_numpy(np.load(one_ring_lbweights_path)).to('cpu').float()
         file = open(connect_path, 'r')
         lines = file.readlines()
         file.close()
@@ -123,8 +124,8 @@ class CariFace():
                 conn_i[:,conn_k] = torch.LongTensor([i, conn_k])
                 conn_k += 1
         conn_v = torch.ones(connects_num).long()
-        self.connect_ = torch.sparse.FloatTensor(conn_i, conn_v, torch.Size([self.vertex_num,connects_num])).to(self.device_num).float()
-        self.landmark_index = torch.from_numpy(np.loadtxt(landmark_index_path)).long().to(self.device_num)
+        self.connect_ = torch.sparse.FloatTensor(conn_i, conn_v, torch.Size([self.vertex_num,connects_num])).to('cpu').float()
+        self.landmark_index = torch.from_numpy(np.loadtxt(landmark_index_path)).long().to('cpu')
     
     def load_train_data(self, image_path, landmark_path, vertex_path, size=32, workers=6):
         trainset = TrainSet(image_path, landmark_path, vertex_path, self.landmark_num, self.vertex_num)
@@ -139,11 +140,11 @@ class CariFace():
         self.model1 = torchvision.models.resnet34(pretrained=True)
         fc_features = self.model1.fc.in_features
         self.model1.fc = nn.Linear(in_features=fc_features, out_features=100)
-        self.model1 = self.model1.to(self.device_num)
-        self.model2 = MyNet(self.vertex_num, self.pca_pri).to(self.device_num)
+        self.model1 = self.model1.to('cpu')
+        self.model2 = MyNet(self.vertex_num, self.pca_pri).to('cpu')
         if use_premodel == True:
-            ck1 = torch.load(model1_path)
-            ck2 = torch.load(model2_path)
+            ck1 = torch.load(model1_path, map_location='cpu')
+            ck2 = torch.load(model2_path, map_location='cpu')
             # ck1 = torch.load(model1_path, map_location={'cuda:0':'cuda:3'})
             # ck2 = torch.load(model2_path, map_location={'cuda:0':'cuda:3'})
             self.model1.load_state_dict(ck1['net'])
@@ -155,7 +156,7 @@ class CariFace():
             {'params':self.model2.fc2.parameters(), 'lr':mynet1_lr}])
         self.optimizer3 = torch.optim.Adam(self.model2.fc3.parameters(), lr = mynet2_lr)
         # loss function
-        self.loss_fn = nn.MSELoss().to(self.device_num)
+        self.loss_fn = nn.MSELoss().to('cpu')
 
     def train(self, epoch, lambda_land=1, lambda_srt=1e-1):
         start = time.time()
@@ -168,7 +169,7 @@ class CariFace():
         loss_3 = 0.0
         with torch.autograd.set_detect_anomaly(True):
             for batch_idx, (img, landmark, vertex) in enumerate(self.train_loader):
-                img, landmark, vertex = img.to(self.device_num).float(), landmark.to(self.device_num).float(), vertex.to(self.device_num).float()
+                img, landmark, vertex = img.to('cpu').float(), landmark.to('cpu').float(), vertex.to('cpu').float()
                 output = self.model1(img)
                 alpha = output[:,0:94] # alpha parameter
                 scale = output[:, 94] # scale parameter
@@ -271,7 +272,7 @@ class CariFace():
         total_num = 0
         with torch.no_grad():
             for img, landmark, lrecord, vrecord in self.test_loader:
-                img, landmark = img.to(self.device_num).float(), landmark.to(self.device_num).float()
+                img, landmark = img.to('cpu').float(), landmark.to('cpu').float()
                 output = self.model1(img)
                 alpha = output[:, 0:94]
                 scale = output[:, 94]
