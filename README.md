@@ -47,7 +47,7 @@ Within ```./CaricatureFace``` directory, run following command:
     bash test.sh
 ```
 
-***alternatively ***
+Then 
 
 Within ```./CaricatureFace``` directory, run following command:
 ```
