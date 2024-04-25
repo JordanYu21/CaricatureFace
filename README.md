@@ -49,17 +49,17 @@ Within ```./CaricatureFace``` directory, run following command:
 ***alternatively ***
 
 Within ```./CaricatureFace``` directory, run following command:
-'''
+```
 python train.py --no_train --landmark_num 68 --vertex_num 6144 --device_num 0 --data_path "data/" --test_image_path "exp/test_images.txt" --test_landmark_path "exp/test_landmarks.txt" --test_lrecord_path "exp/test_lrecord.txt" --test_vrecord_path "exp/test_vrecord.txt" --resnet34_lr 1e-4 --mynet1_lr 1e-5 --mynet2_lr 1e-8 --model1_path "model/resnet34_adam.pth" --model2_path "model/mynet_adam.pth" --premodel
-'''
+```
 
 Note: Input images must be preprocessed - crop the whole face roughly and resize to size (224, 224).
 
 ## Recover 3D faces
 Within ```./CaricatureFace``` directory, run command:
-'''
+```
 python vertex_to_mesh2.py
-'''
+```
 The 3D meshes will be generated as .obj files in the vertex_results folder additionally the caricatures w/ landmarked labels will be generated as .jpg files in the landmark_results folder. 
 
 ## Calculate error
