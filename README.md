@@ -36,19 +36,40 @@ pip install -r requirements.txt
 - You can download some examples here [Google Drive](https://drive.google.com/open?id=1X8TpVpGzRrQuSS93_Hb32ERU-P4q6SSG), or [Baidu Drive](https://pan.baidu.com/s/1fn6Ll3ogF5LrYByBe-T5Ew) with password: sq06.
 - Unzip downloaded files and move files into ```./exp``` directory.
 
+  ** THESE MUST BE PLACED INTO THE EXACT PATH DIRECTORY **
+
+
+
 ## Test with Pretrained Model
 Within ```./CaricatureFace``` directory, run following command:
  ```bash
     bash test.sh
 ```
 
+***alternatively ***
+
+Within ```./CaricatureFace``` directory, run following command:
+'''
+python train.py --no_train --landmark_num 68 --vertex_num 6144 --device_num 0 --data_path "data/" --test_image_path "exp/test_images.txt" --test_landmark_path "exp/test_landmarks.txt" --test_lrecord_path "exp/test_lrecord.txt" --test_vrecord_path "exp/test_vrecord.txt" --resnet34_lr 1e-4 --mynet1_lr 1e-5 --mynet2_lr 1e-8 --model1_path "model/resnet34_adam.pth" --model2_path "model/mynet_adam.pth" --premodel
+'''
+
 Note: Input images must be preprocessed - crop the whole face roughly and resize to size (224, 224).
 
 ## Recover 3D faces
-run command "python vertex_to_mesh2.py"
+Within ```./CaricatureFace``` directory, run command:
+'''
+python vertex_to_mesh2.py
+'''
+The 3D meshes will be generated as .obj files in the vertex_results folder additionally the caricatures w/ landmarked labels will be generated as .jpg files in the landmark_results folder. 
+
+## Calculate error
+Within ```./CaricatureFace``` directory, run command:
+'''
+python cal_error.py
+'''
 
 ## Citation
-If you find this useful for your research, please cite the paper:
+
 ```
 @article{cai2021landmark,
   title={Landmark detection and 3D face reconstruction for caricature using a nonlinear parametric model},
