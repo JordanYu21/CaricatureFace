@@ -64,9 +64,9 @@ The 3D meshes will be generated as .obj files in the vertex_results folder addit
 
 ## Calculate error
 Within ```./CaricatureFace``` directory, run command:
-'''
+```
 python cal_error.py
-'''
+```
 
 ## Citation
 
