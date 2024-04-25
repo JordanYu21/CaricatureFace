@@ -45,13 +45,7 @@ Within ```./CaricatureFace``` directory, run following command:
 Note: Input images must be preprocessed - crop the whole face roughly and resize to size (224, 224).
 
 ## Recover 3D faces
-Please follow README.txt in ```./toy_example``` directory.
-
-## Compute the dynamical contour indices
-Please follow README.txt in ```./update_contour``` directory.
-
-## Gallery
-![examples](fig/examples.png)
+run command "python vertex_to_mesh2.py"
 
 ## Citation
 If you find this useful for your research, please cite the paper:
