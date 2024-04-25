@@ -21,6 +21,7 @@ cd CaricatureFace
 conda create -n cariface python=3.7
 source activate cariface
 pip install -r requirements.txt
+conda install -c conda-forge openmesh-python
 ```
 
 ## Advanced Work
