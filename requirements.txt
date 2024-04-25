@@ -4,3 +4,4 @@ torchvision
 pillow==7.0.0
 opencv-python
 matplotlib
+openmesh
